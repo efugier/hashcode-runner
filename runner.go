@@ -14,8 +14,6 @@ import (
 	"sync"
 )
 
-var wg sync.WaitGroup
-
 const header = "\033[95m"
 const blue = "\033[94m"
 const green = "\033[92m"
@@ -62,12 +60,20 @@ func main() {
 	if len(*datasets) < 2 {
 		*realtimeoutput = true
 	}
-	for i, dataset := range *datasets {
-		results[i] = result{-1, -1, nokred("worse")}
-		wg.Add(1)
-		go testDataset(string(dataset), *model, *scorer, &results[i], *datafolder, *submissionsfolder, *realtimeoutput)
+
+	// Run the computations in parallel
+	{
+		wg := sync.WaitGroup{}
+		for i, dataset := range *datasets {
+			results[i] = result{-1, -1, nokred("worse")}
+			wg.Add(1)
+			go func(res *result, dataset string) {
+				defer wg.Done()
+				testDataset(dataset, *model, *scorer, res, *datafolder, *submissionsfolder, *realtimeoutput)
+			}(&results[i], string(dataset))
+		}
+		wg.Wait()
 	}
-	wg.Wait()
 
 	resTable := tablewriter.NewWriter(os.Stdout)
 	resTable.SetHeader([]string{"Test case", "Old score", "New score", "Status"})
@@ -80,8 +86,6 @@ func main() {
 }
 
 func testDataset(dataset string, model string, scorer string, res *result, datafolder string, submissionsfolder string, realtimeoutput bool) {
-	defer wg.Done()
-
 	// Compute file names
 	inputFileName := fmt.Sprintf("%s/%s.in", datafolder, dataset)
 	scoreFileName := fmt.Sprintf("%s/%s.score", submissionsfolder, dataset)

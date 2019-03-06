@@ -12,14 +12,13 @@ func copyFile(sourcePath, destPath string) error {
 	if err != nil {
 		return fmt.Errorf("Couldn't open source file: %s", err)
 	}
+	defer inputFile.Close()
 	outputFile, err := os.Create(destPath)
 	if err != nil {
-		inputFile.Close()
 		return fmt.Errorf("Couldn't open destination file: %s", err)
 	}
 	defer outputFile.Close()
 	_, err = io.Copy(outputFile, inputFile)
-	inputFile.Close()
 	if err != nil {
 		return fmt.Errorf("Writing to output file failed: %s", err)
 	}
