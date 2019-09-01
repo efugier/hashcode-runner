@@ -1,6 +1,8 @@
+<a href="https://goreportcard.com/report/github.com/efugier/hashcode-runner"><img src="https://goreportcard.com/badge/github.com/efugier/hashcode-runner" alt="Code Status" /></a>
+
 # Purpose
 
-This simple cross-platform runner was made to make our team more efficient during the **Google Hashcode 2019**.
+This simple cross-platform runner was made to improve our team efficiency during the **Google Hashcode 2019**.
 
 It can run a model on multiple datasets in parallel and automatically update the submissions/scores when the output is better so that you never miss or lose a great result.
 
